@@ -13,6 +13,8 @@ class FakeMail:
 
         my_fake_email = FakeMail(First Name, Second Name)
     """
+
+    # lists for creating domain
     first_domain_list: list = ['com', 'ua', 'net', 'info', 'org', 'me', 'so', 'to', 'biz', 'in']
     second_domain_list: list = ['mail', 'gmail', 'mail.yahoo', 'mail.rambler',
                                 'ukr', 'hotmail', 'pochta', 'gmail.com']
@@ -23,13 +25,13 @@ class FakeMail:
 
     def fake_mail_name(self) -> str:
         """
-        Method concatenate number in range 0-999
+        Method concatenate number in range 1950-2015
         with second and first name in random str
 
         Random choice from:
-        first_part: str = (First name, Second name, Number in range 0-999])
+        first_part: str = (First name, Second name, Number in range 1950-2015])
         separator: str = ('None', '_', 'None', '.', '_')
-        second_part: str = (First name, Second name, Number in range 0-999])
+        second_part: str = (First name, Second name, Number in range 1950-2015])
 
         return first_part + separator + second_part
         """
@@ -84,7 +86,7 @@ class FakeUserData:
     def get_fake_user():
         """
         Generate one Fake user
-        :return: f'{fake_name[0]} {my_fake_email.fake_email()}'
+        :return: f'{fake_first_name} {fake_email}'
         """
         fake = Faker()
         fake_name: str = fake.name().split()
@@ -102,10 +104,11 @@ class FakeUserData:
 
 class AverageColumnValue:
     """
-    Class return average value by column in file
+    Class return average value by column in table from file.
+    File should have only table
      file_name: str             - Name of file
      is_header: bool = False    - True if table with header
-     index: int = 0             - The number of column. Star 0 like a first
+     index: int = 0             - The number of column. Start with 0 like a first
      splitter: str = ', '       - symbols that split columns
      res_type = float           - type of data that you expected
     """
@@ -122,7 +125,7 @@ class AverageColumnValue:
     def file_opener(self) -> list:
         """
         Make list from file. One line - one str
-        cut it (like table). False as default
+        Cut header (like table) False as default
         :return: list
         """
         with open(self.file_name, mode='r', encoding='ascii') as f:
@@ -181,4 +184,3 @@ if __name__ == '__main__':
     print(f'Average height is {height_averager_cm} in cm')
     print(f'Average weight is {weight_averager_kg} in kg')
     # print(weight_list_float)
-
