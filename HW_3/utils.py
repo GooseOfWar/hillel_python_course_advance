@@ -1,18 +1,53 @@
+"""
+Module provide Data base operations
+"""
 import sqlite3
 from time import sleep
 
 
 class DBFunctions():
-    CON = 'my_dear_db.db'
+    """
+    Class Provide CRUD functional with DB
 
-    def __init__(self, data: list or tuple = None):
-        self.data = data
+    to create new DB:
+         x = DBFunctions()
+        x._create_new_db() - Create DB with table New_table and columns Name, Phone
+        :return: "Data Base created Successfully" in first start
+
+
+    to create new Data in table:
+        x = DBFunctions()
+        x.create_data_db(data = [Name, Phone])
+        return "Data created"
+
+    to read Data from DB:
+        x = DBFunctions()
+        x.read_db()
+        :return: data.__str__()
+
+    to update Data in DB:
+        x = DBFunctions()
+        x.update_db(Name, new_Phone)
+        :return: 'Data updated successfully'
+
+    to delete specified Data from DB:
+        x = DBFunctions()
+        x.delete_db(delete: str = None)
+        :return: 'Data was Deleted'
+
+    """
+    CON = 'my_dear_db.db'  # DB file
 
     def _create_new_db(self):
-        con = sqlite3.connect(DBFunctions.CON)
+        """
+        ._create_new_db() - Create DB with table New_table and columns Name, Phone
+        :return: "Data Base created Successfully" in first start
+        """
+        con = sqlite3.connect(DBFunctions.CON)  # connect to db
         try:
             cur = con.cursor()
-            cur.execute(f'''CREATE TABLE New_table (Name varchar(128) UNIQUE, Phone varchar(128))''')
+            cur.execute('''CREATE TABLE New_table
+             (Name varchar(128) UNIQUE, Phone varchar(128))''')
             con.commit()
         except sqlite3.OperationalError as error:
             con.close()
@@ -20,14 +55,17 @@ class DBFunctions():
         con.close()
         return "Data Base created Successfully"
 
-    def create_data_db(self, **kwargs):
-        """Create new data in DB"""
-        con = sqlite3.connect(DBFunctions.CON)
+    def create_data_db(self, data: list or tuple = None, **kwargs):
+        """Create new data in New_table
+        x = DBFunctions(data = [Name, Phone]
+        x.create_data_db()
+        """
+        con = sqlite3.connect(DBFunctions.CON)  # connect to db
         try:
             cur = con.cursor()
             sql = f'''
             INSERT INTO New_table
-            VALUES ('{self.data[0]}', '{self.data[1]}');
+            VALUES ('{data[0]}', '{data[1]}');
             '''
             cur.execute(sql)
             con.commit()
@@ -35,23 +73,31 @@ class DBFunctions():
             con.close()
             return f'A little bird told me {error}'
         con.close()
-        return "Data created"
+        return f'{data[0]}:  {data[1]}  Successfully added to base'
 
     def read_db(self, **kwargs):
-        """Read data in DB"""
-        con = sqlite3.connect(DBFunctions.CON)
+        """Read data in DB
+        x = DBFunctions()
+        x.read_db()
+        :return: data.__str__()
+        """
+        con = sqlite3.connect(DBFunctions.CON)  # connect to db
         try:
             cur = con.cursor()
             sql = 'SELECT * FROM New_Table;'
             cur.execute(sql)
-            data = cur.fetchall()
+            data: list = cur.fetchall()
         finally:
             con.close()
         return data.__str__()
 
     def update_db(self, name, new_phone, **kwargs):
-        """Update data in DB"""
-        con = sqlite3.connect(DBFunctions.CON)
+        """Update data in DB
+        x = DBFunctions()
+        x.update_db(Name, new_Phone)
+        :return: 'Data updated successfully'
+        """
+        con = sqlite3.connect(DBFunctions.CON)  # connect to db
         try:
             cur = con.cursor()
             sql = f'''
@@ -63,21 +109,30 @@ class DBFunctions():
             con.commit()
         finally:
             con.close()
-        return 'Data updated successfully'
+        return f'{name} Data successfully updated to {new_phone}'
 
     def delete_db(self, delete: str = None, **kwargs):
-        """Delete specified data in DB"""
-        con = sqlite3.connect(DBFunctions.CON)
+        """Delete specified data in DB
+        x = DBFunctions()
+        x.delete_db(delete: str = None)
+        :return: 'Data was Deleted'
+        """
+
+        con = sqlite3.connect(DBFunctions.CON)  # connect to db
         try:
+            if type(delete) != str:
+                raise TypeError
             cur = con.cursor()
             sql = f'''
             DELETE FROM New_table WHERE Name == '{delete}';
             '''
             cur.execute(sql)
             con.commit()
-        finally:
+        except TypeError as error:
             con.close()
-        return 'Data was Deleted'
+            return f'Invalid type {error}'
+        con.close()
+        return f'For {delete} data was Deleted'
 
 
 class DBOperator(DBFunctions):
@@ -96,8 +151,8 @@ class DBOperator(DBFunctions):
         result = new_db._create_new_db()
 
     Create new Data in DB:
-        new_data = DBOperator(data=("Valley", '+262 656 6859'))
-        result = new_data.set_db('-c')
+        new_data = DBOperator()
+        result = new_data.set_db('-c', data=("Valley", '+262 656 6859'))
 
 
     Read DB:
@@ -120,20 +175,29 @@ class DBOperator(DBFunctions):
 
     """
 
-    def __init__(self, data: list or tuple = None):
-        super().__init__()
-        self.data = data
-
-    def set_db(self, flag: str = '-r', name=None, new_phone=None, delete=None):
+    def set_db(self, flag: str = '-r', data: list or tuple = None,
+               name: str = None, new_phone: str = None, delete: str = None):
+        """
+        Function set operations with DB
+        :param flag: only 4 flag for all:'-c','-r','-u','-d'
+        :param data: data=("Valley", '+262 656 6859') (create)
+        :param name: Name for which changes are being made (update)
+        :param new_phone: New Phone (update)
+        :param delete: Name for which data will be deleted
+        """
         sleep(0.5)
         operations_set: dict = {'-c': self.create_data_db,
                                 '-r': self.read_db,
                                 '-u': self.update_db,
                                 '-d': self.delete_db}
-
-        return operations_set[flag](name=name,
-                                    new_phone=new_phone,
-                                    delete=delete)
+        try:
+            result = operations_set[flag](data=data,
+                                          name=name,
+                                          new_phone=new_phone,
+                                          delete=delete)
+            return result
+        except KeyError as error:
+            return f'Invalid input Data {error}'
 
 
 if __name__ == '__main__':
