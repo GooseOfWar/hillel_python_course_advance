@@ -201,4 +201,5 @@ class DBOperator(DBFunctions):
 
 
 if __name__ == '__main__':
+    # DBOperator()._create_new_db()
     ...
